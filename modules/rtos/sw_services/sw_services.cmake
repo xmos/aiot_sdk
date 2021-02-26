@@ -14,6 +14,7 @@ set(MQTT_DIR "${SW_SERVICES_DIR}/mqtt")
 set(SNTPD_DIR "${SW_SERVICES_DIR}/sntpd")
 set(TLS_SUPPORT_DIR "${SW_SERVICES_DIR}/tls_support")
 set(TINYUSB_DIR "${SW_SERVICES_DIR}/usb")
+set(LWIP_DIR "${SW_SERVICES_DIR}/lwip")
 
 #**********************
 # Options
@@ -28,6 +29,7 @@ option(USE_SNTPD "Enable to use SNTPD" FALSE)
 option(USE_TLS_SUPPORT "Enable to use TLS support" FALSE)
 option(USE_CUSTOM_MBEDTLS_CONFIG "Enable to use provide an alternate mbedtls_config.h" FALSE)
 option(USE_TINYUSB "Enable to use TinyUSB" FALSE)
+option(USE_LWIP "Enable to use LWIP" FALSE)
 
 #********************************
 # Gather wifi manager sources
@@ -352,6 +354,102 @@ if(${USE_${THIS_LIB}})
 endif()
 unset(THIS_LIB)
 
+#********************************
+# Gather lwip sources
+#********************************
+set(THIS_LIB LWIP)
+if(${USE_${THIS_LIB}})
+	set(${THIS_LIB}_FLAGS "-Os")
+
+    set(${THIS_LIB}_SOURCES
+        ${${THIS_LIB}_DIR}/port/FreeRTOS/netif/wifi_inf.c
+
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/init.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/def.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/dns.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/inet_chksum.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ip.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/mem.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/memp.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/netif.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/pbuf.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/raw.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/stats.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/sys.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/altcp.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/altcp_alloc.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/altcp_tcp.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/tcp.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/tcp_in.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/tcp_out.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/timeouts.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/udp.c
+
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv4/autoip.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv4/dhcp.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv4/etharp.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv4/icmp.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv4/igmp.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv4/ip4_frag.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv4/ip4.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv4/ip4_addr.c
+
+            ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/dhcp6.c
+            ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/ethip6.c
+            ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/icmp6.c
+            ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/inet6.c
+            ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/ip6.c
+            ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/ip6_addr.c
+            ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/ip6_frag.c
+            ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/mld6.c
+            ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/nd6.c
+
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/api/api_lib.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/api/api_msg.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/api/err.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/api/if_api.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/api/netbuf.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/api/netdb.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/api/netifapi.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/api/sockets.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/api/tcpip.c
+
+${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/ethernet.c
+${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/bridgeif.c
+${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/bridgeif_fdb.c
+${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/slipif.c
+
+${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/lowpan6_common.c
+${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/lowpan6.c
+${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/lowpan6_ble.c
+${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/zepif.c
+    )
+
+    if(RTOS_CMAKE_RTOS STREQUAL "FreeRTOS")
+        list(APPEND ${THIS_LIB}_SOURCES "${${THIS_LIB}_DIR}/thirdparty/lwip-contrib/ports/freertos/sys_arch.c")
+    endif()
+
+    if(${${THIS_LIB}_FLAGS})
+       set_source_files_properties(${${THIS_LIB}_SOURCES} PROPERTIES COMPILE_FLAGS ${${THIS_LIB}_FLAGS})
+    endif()
+
+	set(${THIS_LIB}_INCLUDES
+        "${${THIS_LIB}_DIR}/port"
+        "${${THIS_LIB}_DIR}/${RTOS_CMAKE_RTOS}"
+        "${${THIS_LIB}_DIR}/thirdparty/lwip/src/include"
+	)
+
+    if(RTOS_CMAKE_RTOS STREQUAL "FreeRTOS")
+        list(APPEND ${THIS_LIB}_INCLUDES "${${THIS_LIB}_DIR}/thirdparty/lwip-contrib/ports/freertos/include")
+    endif()
+
+    add_compile_definitions(
+        ""
+    )
+    message("${COLOR_GREEN}Adding ${THIS_LIB}...${COLOR_RESET}")
+endif()
+unset(THIS_LIB)
+
 #**********************
 # set user variables
 #**********************
@@ -377,6 +475,7 @@ set(SW_SERVICES_NETWORKING_SOURCES
     ${MQTT_SOURCES}
     ${SNTPD_SOURCES}
     ${TLS_SUPPORT_SOURCES}
+    ${LWIP_SOURCES}
 )
 
 set(SW_SERVICES_NETWORKING_INCLUDES
@@ -386,6 +485,7 @@ set(SW_SERVICES_NETWORKING_INCLUDES
     ${MQTT_INCLUDES}
     ${SNTPD_INCLUDES}
     ${TLS_SUPPORT_INCLUDES}
+    ${LWIP_INCLUDES}
 )
 
 list(REMOVE_DUPLICATES SW_SERVICES_NETWORKING_SOURCES)

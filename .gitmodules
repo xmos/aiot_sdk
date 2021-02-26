@@ -76,3 +76,9 @@
 [submodule "modules/adf"]
 	path = modules/adf
 	url = git@github.com:xmos/adf.git
+[submodule "lwip"]
+	path = modules/rtos/sw_services/lwip/thirdparty/lwip
+	url = git://git.savannah.gnu.org/lwip.git
+[submodule "lwip-contrib"]
+	path = modules/rtos/sw_services/lwip/thirdparty/lwip-contrib
+	url = git://git.savannah.gnu.org/lwip/lwip-contrib.git
