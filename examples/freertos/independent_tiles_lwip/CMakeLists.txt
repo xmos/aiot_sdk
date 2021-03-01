@@ -10,6 +10,7 @@ endif()
 # set(USE_DHCPD TRUE)
 set(USE_FATFS TRUE)
 set(USE_LWIP TRUE)
+set(RTOS_NETWORK_STACK lwip)
 
 ## Import XMOS configurations
 include("$ENV{XMOS_AIOT_SDK_PATH}/tools/cmake_utils/xmos_rtos_platform.cmake")

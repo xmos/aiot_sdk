@@ -28,6 +28,9 @@ aiot_sdk_venv/*
 **/test_results.csv
 **/.venv/**
 .metadata
+*.bin
+*.dat
+*.fs
 
 # Test cruft
 **/.pytest_cache/*

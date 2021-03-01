@@ -16,6 +16,11 @@ if(NOT DEFINED RTOS_WIFI_CHIP)
     set(RTOS_WIFI_CHIP "sl_wf200") # only WiFi module currently supported
 endif()
 
+if(NOT DEFINED RTOS_NETWORK_STACK)
+    set(RTOS_NETWORK_STACK "FreeRTOS-Plus-TCP")
+    # set(RTOS_NETWORK_STACK "lwip")
+endif()
+
 #********************************
 # Gather various sources
 #********************************

@@ -65,35 +65,37 @@ unset(THIS_LIB)
 # Gather FreeRTOS-Plus-TCP sources
 #********************************
 set(THIS_LIB FREERTOS_PLUS_TCP)
-set(${THIS_LIB}_FLAGS "-Os")
+if(RTOS_NETWORK_STACK STREQUAL "FreeRTOS-Plus-TCP")
+    set(${THIS_LIB}_FLAGS "-Os")
 
-# Always use the sources from the single core kernel dir for Plus TCP
-set(${THIS_LIB}_DIR "$ENV{XMOS_AIOT_SDK_PATH}/modules/rtos/FreeRTOS/FreeRTOS-Plus-TCP")
-set(${THIS_LIB}_PORTABLE_DIR "$ENV{XMOS_AIOT_SDK_PATH}/modules/rtos/FreeRTOS/portable/FreeRTOS-Plus-TCP")
+    # Always use the sources from the single core kernel dir for Plus TCP
+    set(${THIS_LIB}_DIR "$ENV{XMOS_AIOT_SDK_PATH}/modules/rtos/FreeRTOS/FreeRTOS-Plus-TCP")
+    set(${THIS_LIB}_PORTABLE_DIR "$ENV{XMOS_AIOT_SDK_PATH}/modules/rtos/FreeRTOS/portable/FreeRTOS-Plus-TCP")
 
-set(${THIS_LIB}_SOURCES
-    "${${THIS_LIB}_DIR}/FreeRTOS_ARP.c"
-    "${${THIS_LIB}_DIR}/FreeRTOS_DHCP.c"
-    "${${THIS_LIB}_DIR}/FreeRTOS_DNS.c"
-    "${${THIS_LIB}_DIR}/FreeRTOS_IP.c"
-    "${${THIS_LIB}_DIR}/FreeRTOS_Sockets.c"
-    "${${THIS_LIB}_DIR}/FreeRTOS_Stream_Buffer.c"
-    "${${THIS_LIB}_DIR}/FreeRTOS_TCP_IP.c"
-    "${${THIS_LIB}_DIR}/FreeRTOS_TCP_WIN.c"
-    "${${THIS_LIB}_DIR}/FreeRTOS_UDP_IP.c"
-    "${${THIS_LIB}_DIR}/portable/BufferManagement/BufferAllocation_2.c"
-    "${${THIS_LIB}_PORTABLE_DIR}/NetworkInterface/FreeRTOS_TCP_port.c"
-)
+    set(${THIS_LIB}_SOURCES
+        "${${THIS_LIB}_DIR}/FreeRTOS_ARP.c"
+        "${${THIS_LIB}_DIR}/FreeRTOS_DHCP.c"
+        "${${THIS_LIB}_DIR}/FreeRTOS_DNS.c"
+        "${${THIS_LIB}_DIR}/FreeRTOS_IP.c"
+        "${${THIS_LIB}_DIR}/FreeRTOS_Sockets.c"
+        "${${THIS_LIB}_DIR}/FreeRTOS_Stream_Buffer.c"
+        "${${THIS_LIB}_DIR}/FreeRTOS_TCP_IP.c"
+        "${${THIS_LIB}_DIR}/FreeRTOS_TCP_WIN.c"
+        "${${THIS_LIB}_DIR}/FreeRTOS_UDP_IP.c"
+        "${${THIS_LIB}_DIR}/portable/BufferManagement/BufferAllocation_2.c"
+        "${${THIS_LIB}_PORTABLE_DIR}/NetworkInterface/FreeRTOS_TCP_port.c"
+    )
 
-set_source_files_properties(${${THIS_LIB}_SOURCES} PROPERTIES COMPILE_FLAGS ${${THIS_LIB}_FLAGS})
+    set_source_files_properties(${${THIS_LIB}_SOURCES} PROPERTIES COMPILE_FLAGS ${${THIS_LIB}_FLAGS})
 
-set(${THIS_LIB}_INCLUDES
-    "${${THIS_LIB}_DIR}/include"
-    "${${THIS_LIB}_PORTABLE_DIR}/Compiler"
-    "${${THIS_LIB}_PORTABLE_DIR}/NetworkInterface"
-)
+    set(${THIS_LIB}_INCLUDES
+        "${${THIS_LIB}_DIR}/include"
+        "${${THIS_LIB}_PORTABLE_DIR}/Compiler"
+        "${${THIS_LIB}_PORTABLE_DIR}/NetworkInterface"
+    )
 
-message("${COLOR_GREEN}Adding ${THIS_LIB}...${COLOR_RESET}")
+    message("${COLOR_GREEN}Adding ${THIS_LIB}...${COLOR_RESET}")
+endif()
 unset(THIS_LIB)
 
 #**********************
@@ -110,12 +112,12 @@ set(KERNEL_INCLUDES
 list(REMOVE_DUPLICATES KERNEL_SOURCES)
 list(REMOVE_DUPLICATES KERNEL_INCLUDES)
 
-set(KERNEL_NETWORKING_SOURCES ""
-    # ${FREERTOS_PLUS_TCP_SOURCES}
+set(KERNEL_NETWORKING_SOURCES
+    ${FREERTOS_PLUS_TCP_SOURCES}
 )
 
-set(KERNEL_NETWORKING_INCLUDES ""
-    # ${FREERTOS_PLUS_TCP_INCLUDES}
+set(KERNEL_NETWORKING_INCLUDES
+    ${FREERTOS_PLUS_TCP_INCLUDES}
 )
 
 list(REMOVE_DUPLICATES KERNEL_NETWORKING_SOURCES)
