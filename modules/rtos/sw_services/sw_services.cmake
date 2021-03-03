@@ -363,8 +363,6 @@ if(${USE_${THIS_LIB}})
 	set(${THIS_LIB}_FLAGS "-Os")
 
     set(${THIS_LIB}_SOURCES
-        ${${THIS_LIB}_DIR}/port/FreeRTOS/netif/wifi_inf.c
-
         ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/init.c
         ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/def.c
         ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/dns.c
@@ -395,15 +393,15 @@ if(${USE_${THIS_LIB}})
         ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv4/ip4.c
         ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv4/ip4_addr.c
 
-            ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/dhcp6.c
-            ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/ethip6.c
-            ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/icmp6.c
-            ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/inet6.c
-            ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/ip6.c
-            ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/ip6_addr.c
-            ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/ip6_frag.c
-            ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/mld6.c
-            ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/nd6.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/dhcp6.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/ethip6.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/icmp6.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/inet6.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/ip6.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/ip6_addr.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/ip6_frag.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/mld6.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/core/ipv6/nd6.c
 
         ${${THIS_LIB}_DIR}/thirdparty/lwip/src/api/api_lib.c
         ${${THIS_LIB}_DIR}/thirdparty/lwip/src/api/api_msg.c
@@ -415,15 +413,15 @@ if(${USE_${THIS_LIB}})
         ${${THIS_LIB}_DIR}/thirdparty/lwip/src/api/sockets.c
         ${${THIS_LIB}_DIR}/thirdparty/lwip/src/api/tcpip.c
 
-${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/ethernet.c
-${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/bridgeif.c
-${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/bridgeif_fdb.c
-${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/slipif.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/ethernet.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/bridgeif.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/bridgeif_fdb.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/slipif.c
 
-${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/lowpan6_common.c
-${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/lowpan6.c
-${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/lowpan6_ble.c
-${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/zepif.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/lowpan6_common.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/lowpan6.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/lowpan6_ble.c
+        ${${THIS_LIB}_DIR}/thirdparty/lwip/src/netif/zepif.c
     )
 
     if(RTOS_CMAKE_RTOS STREQUAL "FreeRTOS")

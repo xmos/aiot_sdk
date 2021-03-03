@@ -10,11 +10,9 @@
 // #include "FreeRTOS_IP.h"
 // #include "FreeRTOS_IP_Private.h"
 // #include "FreeRTOS_Sockets.h"
-#include "lwip/init.h"
-
 #include "wifi_test.h"
 
-#include "sl_wfx_iot_wifi.h"
+#include "FreeRTOS/sl_wfx_iot_wifi.h"
 
 #include "wifi.h"
 #include "ff.h"
@@ -60,6 +58,7 @@ static void scan(void)
 
 int wifi_conn_mgr_event_cb(int event, char *ssid, char *password)
 {
+    rtos_printf("wifi_conn_mgr_event_cb\n");
     switch (event) {
     case WIFI_CONN_MGR_EVENT_STARTUP:
         rtos_printf("Directing WiFi manager to go into station mode\n");
@@ -185,20 +184,20 @@ static void wifi_test_task(wifi_test_devs_t *wifi_devs)
                         wifi_irq_port, 0,
                         wifi_wup_rst_port, 0,
                         wifi_wup_rst_port, 1);
-
     // const uint8_t ucIPAddress[ 4 ] = { IPconfig_IP_ADDR_OCTET_0, IPconfig_IP_ADDR_OCTET_1, IPconfig_IP_ADDR_OCTET_2, IPconfig_IP_ADDR_OCTET_3 };
     // const uint8_t ucNetMask[ 4 ] = { IPconfig_NET_MASK_OCTET_0, IPconfig_NET_MASK_OCTET_1, IPconfig_NET_MASK_OCTET_2, IPconfig_NET_MASK_OCTET_3 };
     // const uint8_t ucGatewayAddress[ 4 ] = { IPconfig_GATEWAY_OCTET_0, IPconfig_GATEWAY_OCTET_1, IPconfig_GATEWAY_OCTET_2, IPconfig_GATEWAY_OCTET_3 };
     // const uint8_t ucDNSServerAddress[ 4 ] = { IPconfig_DNS_SERVER_OCTET_0, IPconfig_DNS_SERVER_OCTET_1, IPconfig_DNS_SERVER_OCTET_2, IPconfig_DNS_SERVER_OCTET_3 };
     // uint8_t ucMACAddress[ 6 ] = { 0, 0, 0, 0, 0, 0 };
+// rtos_printf("call lwip init\n");
+//     lwip_init();
+// rtos_printf("lwip init done\n");
 
-      lwip_init();
     // FreeRTOS_IPInit(ucIPAddress,
     //                 ucNetMask,
     //                 ucGatewayAddress,
     //                 ucDNSServerAddress,
     //                 ucMACAddress);
-
     wifi_conn_mgr_start(configMAX_PRIORITIES - 3, configMAX_PRIORITIES / 2);
 
     vTaskDelete(NULL);
@@ -213,7 +212,7 @@ void wifi_test_start(rtos_spi_master_device_t *wifi_device_ctx, rtos_gpio_t *gpi
 
     xTaskCreate((TaskFunction_t) wifi_test_task,
                 "wifi_test_task",
-                RTOS_THREAD_STACK_SIZE(wifi_test_task),
+                2000,//RTOS_THREAD_STACK_SIZE(wifi_test_task),
                 &wifi_devs,
                 configMAX_PRIORITIES/2 - 1,
                 NULL);

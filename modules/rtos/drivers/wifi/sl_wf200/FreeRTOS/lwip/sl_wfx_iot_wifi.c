@@ -18,6 +18,10 @@
 #include "brd8022a_pds.h"
 #include "brd8023a_pds.h"
 
+#include "FreeRTOS/lwip/sl_wfx_network_interface.h"
+
+#include "lwip/def.h"
+
 /* SW services headers */
 #include "FreeRTOS/sl_wfx_iot_wifi.h"
 #if USE_DHCPD
@@ -35,6 +39,8 @@
 
 static sl_wfx_context_t wfx_ctx;
 
+static struct netif sta_netif, ap_netif;
+
 static WIFIDeviceMode_t wifi_mode = eWiFiModeStation;
 
 static struct
@@ -51,6 +57,26 @@ static struct
 
 static SemaphoreHandle_t wifi_lock;
 static QueueHandle_t ping_reply_queue;
+
+void lwip_station_connected(void) {
+    netif_set_up(&sta_netif);
+    netif_set_link_up(&sta_netif);
+}
+
+void lwip_station_disconnected(void) {
+    netif_set_link_down(&sta_netif);
+    netif_set_down(&sta_netif);
+}
+
+void lwip_ap_connected(void) {
+    netif_set_up(&ap_netif);
+    netif_set_link_up(&ap_netif);
+}
+
+void lwip_ap_disconnected(void) {
+    netif_set_link_down(&ap_netif);
+    netif_set_down(&ap_netif);
+}
 
 WIFIReturnCode_t WIFI_GetLock( void )
 {
@@ -204,6 +230,20 @@ WIFIReturnCode_t WIFI_On( void )
             {
                 wifi_mode = eWiFiModeStation;
                 ret = eWiFiSuccess;
+
+                ip_addr_t sta_ipaddr, ap_ipaddr;
+                ip_addr_t sta_netmask, ap_netmask;
+                ip_addr_t sta_gw, ap_gw;
+
+                rtos_printf("adding netif\n");
+                // add dummy values for now.
+                netif_add(&sta_netif,
+                        &sta_ipaddr,
+                        &sta_netmask,
+                        &sta_gw,
+                        NULL,
+                        &sta_wifi_if_init,
+                        &tcpip_input);
             }
 
             xSemaphoreGiveRecursive( wifi_lock );
@@ -263,7 +303,8 @@ void sl_wfx_disconnect_callback(uint8_t *mac, sl_wfx_disconnected_reason_t reaso
 
     if( ( bits & SL_WFX_CONNECT ) != 0 )
     {
-        rtos_printf("Bringing the FreeRTOS network down\n");
+        rtos_printf("Bringing the network down\n");
+        lwip_station_disconnected();
         // FreeRTOS_NetworkDown();
     }
 }
@@ -355,6 +396,7 @@ void sl_wfx_connect_callback( uint8_t *mac, sl_wfx_fmac_status_t status )
     if( connected )
     {
         sl_wfx_context->state |= SL_WFX_STA_INTERFACE_CONNECTED;
+        lwip_station_connected();
         xEventGroupSetBits( sl_wfx_event_group, SL_WFX_CONNECT );
         xEventGroupClearBits( sl_wfx_event_group, SL_WFX_DISCONNECT );
     }
@@ -376,7 +418,8 @@ void sl_wfx_connect_callback( uint8_t *mac, sl_wfx_fmac_status_t status )
              * thus ensuring it is cleared. Bring the FreeRTOS TCP stack down, which
              * will likely cause the application to attempt to reconnect.
              */
-            rtos_printf("Bringing the FreeRTOS network down\n");
+            rtos_printf("Bringing the network down\n");
+            lwip_station_disconnected();
             // FreeRTOS_NetworkDown();
         }
 
@@ -758,17 +801,17 @@ WIFIReturnCode_t WIFI_NetworkDelete( uint16_t usIndex )
 #endif
 }
 
-#if ( ipconfigSUPPORT_OUTGOING_PINGS == 1 )
-__attribute__((weak))
-void vApplicationPingReplyHook(ePingReplyStatus_t eStatus, uint16_t usIdentifier)
-{
-	if (eStatus == eSuccess) {
-		#if USE_DHCPD
-			dhcpd_ping_reply_received( usIdentifier );
-		#endif
-		xQueueOverwrite(ping_reply_queue, &usIdentifier);
-	}
-}
+// #if ( ipconfigSUPPORT_OUTGOING_PINGS == 1 )
+// __attribute__((weak))
+// void vApplicationPingReplyHook(ePingReplyStatus_t eStatus, uint16_t usIdentifier)
+// {
+// 	if (eStatus == eSuccess) {
+// 		#if USE_DHCPD
+// 			dhcpd_ping_reply_received( usIdentifier );
+// 		#endif
+// 		xQueueOverwrite(ping_reply_queue, &usIdentifier);
+// 	}
+// }
 
 WIFIReturnCode_t WIFI_Ping( uint8_t *pucIPAddr,
                             uint16_t usCount,
@@ -776,7 +819,7 @@ WIFIReturnCode_t WIFI_Ping( uint8_t *pucIPAddr,
 {
     uint32_t ip;
     uint32_t arp_ip;
-    MACAddress_t arp_mac;
+    // MACAddress_t arp_mac;
     TickType_t last_wake;
     int i;
     int good = 0;
@@ -829,7 +872,7 @@ WIFIReturnCode_t WIFI_Ping( uint8_t *pucIPAddr,
 
     return good > 0 ? eWiFiSuccess : eWiFiFailure;
 }
-#endif
+// #endif
 
 WIFIReturnCode_t WIFI_GetIP( uint8_t *pucIPAddr )
 {
@@ -1072,7 +1115,8 @@ void sl_wfx_start_ap_callback(sl_wfx_fmac_status_t status)
              * thus ensuring it is cleared. Bring the FreeRTOS TCP stack down, which
              * will likely cause the application to attempt to restart the soft AP.
              */
-            rtos_printf("Bringing the FreeRTOS network down\n");
+            rtos_printf("Bringing the network down\n");
+            lwip_station_disconnected();
             // FreeRTOS_NetworkDown();
         }
 
@@ -1180,7 +1224,8 @@ void sl_wfx_stop_ap_callback(void)
 
     if( ( bits & SL_WFX_START_AP ) != 0 )
     {
-        rtos_printf("Bringing the FreeRTOS network down\n");
+        rtos_printf("Bringing the network down\n");
+        lwip_station_disconnected();
         // FreeRTOS_NetworkDown();
     }
 }

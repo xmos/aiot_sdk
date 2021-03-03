@@ -1,4 +1,4 @@
-// Copyright 2020 XMOS LIMITED. This Software is subject to the terms of the 
+// Copyright 2020 XMOS LIMITED. This Software is subject to the terms of the
 // XMOS Public License: Version 1
 
 #include <string.h>
@@ -140,7 +140,7 @@ void sl_wfx_host_task_start(void)
 
         xTaskCreate(sl_wfx_host_receive_task,
                     "sl_wfx_host_receive_task",
-                    portTASK_STACK_DEPTH(sl_wfx_host_receive_task),
+                    2000,//portTASK_STACK_DEPTH(sl_wfx_host_receive_task),
                     NULL,
 					configMAX_PRIORITIES - 1,
                     &receive_task_handle);

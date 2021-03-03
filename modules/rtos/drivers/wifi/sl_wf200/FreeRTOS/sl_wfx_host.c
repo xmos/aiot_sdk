@@ -1,4 +1,4 @@
-// Copyright 2020 XMOS LIMITED. This Software is subject to the terms of the 
+// Copyright 2020 XMOS LIMITED. This Software is subject to the terms of the
 // XMOS Public License: Version 1
 
 
@@ -97,7 +97,7 @@ sl_status_t sl_wfx_app_fw_read(uint8_t *data, uint32_t index, uint32_t size)
 }
 
 /**** WF200 Driver Required Host Functions Start ****/
-
+__attribute__((weak))
 sl_status_t sl_wfx_host_init(void)
 {
     host_ctx.firmware_index = 0;
@@ -108,6 +108,7 @@ sl_status_t sl_wfx_host_init(void)
     return SL_STATUS_OK;
 }
 
+__attribute__((weak))
 sl_status_t sl_wfx_host_get_firmware_data(const uint8_t **data, uint32_t data_size)
 {
 	sl_status_t ret;
@@ -122,7 +123,7 @@ sl_status_t sl_wfx_host_get_firmware_data(const uint8_t **data, uint32_t data_si
     return ret;
 }
 
-
+__attribute__((weak))
 sl_status_t sl_wfx_host_get_firmware_size(uint32_t *firmware_size)
 {
     *firmware_size = sl_wfx_app_fw_size();
@@ -133,6 +134,7 @@ sl_status_t sl_wfx_host_get_firmware_size(uint32_t *firmware_size)
     return SL_STATUS_OK;
 }
 
+__attribute__((weak))
 sl_status_t sl_wfx_host_get_pds_data(const char **pds_data, uint16_t index)
 {
     if (host_ctx.pds_data == NULL) {
@@ -143,6 +145,7 @@ sl_status_t sl_wfx_host_get_pds_data(const char **pds_data, uint16_t index)
     return SL_STATUS_OK;
 }
 
+__attribute__((weak))
 sl_status_t sl_wfx_host_get_pds_size(uint16_t *pds_size)
 {
     if (host_ctx.pds_size == 0) {
@@ -153,11 +156,13 @@ sl_status_t sl_wfx_host_get_pds_size(uint16_t *pds_size)
     return SL_STATUS_OK;
 }
 
+__attribute__((weak))
 sl_status_t sl_wfx_host_deinit(void)
 {
     return SL_STATUS_OK;
 }
 
+__attribute__((weak))
 sl_status_t sl_wfx_host_reset_chip(void)
 {
     host_ctx.waited_event_id = 0;
@@ -170,6 +175,7 @@ sl_status_t sl_wfx_host_reset_chip(void)
     return SL_STATUS_OK;
 }
 
+__attribute__((weak))
 sl_status_t sl_wfx_host_set_wake_up_pin(uint8_t state)
 {
     if (state != 0) {
@@ -188,6 +194,7 @@ sl_status_t sl_wfx_host_set_wake_up_pin(uint8_t state)
     return SL_STATUS_OK;
 }
 
+__attribute__((weak))
 sl_status_t sl_wfx_host_wait_for_wake_up(void)
 {
     EventBits_t bits;
@@ -203,6 +210,7 @@ sl_status_t sl_wfx_host_wait_for_wake_up(void)
     return SL_STATUS_OK;
 }
 
+__attribute__((weak))
 sl_status_t sl_wfx_host_sleep_grant(sl_wfx_host_bus_transfer_type_t type,
                                     sl_wfx_register_address_t address,
                                     uint32_t length)
@@ -210,12 +218,14 @@ sl_status_t sl_wfx_host_sleep_grant(sl_wfx_host_bus_transfer_type_t type,
     return SL_STATUS_WIFI_SLEEP_GRANTED;
 }
 
+__attribute__((weak))
 sl_status_t sl_wfx_host_hold_in_reset(void)
 {
     sl_wfx_host_gpio(SL_WFX_HIF_GPIO_RESET, 0);
     return SL_STATUS_OK;
 }
 
+__attribute__((weak))
 sl_status_t sl_wfx_host_setup_waited_event(uint8_t event_id)
 {
     host_ctx.waited_event_id = event_id;
@@ -223,6 +233,7 @@ sl_status_t sl_wfx_host_setup_waited_event(uint8_t event_id)
     return SL_STATUS_OK;
 }
 
+__attribute__((weak))
 sl_status_t sl_wfx_host_wait_for_confirmation(uint8_t confirmation_id,
                                               uint32_t timeout_ms,
                                               void **event_payload_out)
@@ -251,12 +262,14 @@ sl_status_t sl_wfx_host_wait_for_confirmation(uint8_t confirmation_id,
     return SL_STATUS_TIMEOUT;
 }
 
+__attribute__((weak))
 sl_status_t sl_wfx_host_wait(uint32_t wait_ms)
 {
     vTaskDelay(pdMS_TO_TICKS(wait_ms));
     return SL_STATUS_OK;
 }
 
+__attribute__((weak))
 sl_status_t sl_wfx_host_post_event(sl_wfx_generic_message_t *event_payload)
 {
     switch(event_payload->header.id){
@@ -377,41 +390,12 @@ sl_status_t sl_wfx_host_post_event(sl_wfx_generic_message_t *event_payload)
       return SL_STATUS_OK;
 }
 
+__attribute__((weak))
 sl_status_t sl_wfx_host_allocate_buffer(void **buffer,
                                         sl_wfx_buffer_type_t type,
                                         uint32_t buffer_size)
 {
-/*
- * Zero copy RX is no longer supported. This code is being left in place
- * for the future if support for these is ever added back in.
- */
-#if 0
-    if (ipconfigZERO_COPY_RX_DRIVER != 0 && type == SL_WFX_RX_FRAME_BUFFER) {
-        NetworkBufferDescriptor_t *network_buffer;
-        network_buffer = pxGetNetworkBufferWithDescriptor( buffer_size, 0 );
-        if (network_buffer != NULL) {
-            /*
-             * The pointer that will be returned to the driver is behind the beginning
-             * of the Ethernet Frame by the size of the received indication message and
-             * SL_WFX_NORMAL_FRAME_PAD_LENGTH padding bytes. This way frames with 2 pad
-             * bytes will begin at where pucEthernetBuffer points to.
-             *
-             * When the padding is other than SL_WFX_NORMAL_FRAME_PAD_LENGTH bytes then
-             * this needs to be dealt with in the receive callback.
-             *
-             * This requires that the FreeRTOS+TCP option ipBUFFER_PADDING be large enough
-             * to hold the sl_wfx_received_ind_t message.
-             */
-            *buffer = network_buffer->pucEthernetBuffer - sizeof(sl_wfx_received_ind_t) - SL_WFX_NORMAL_FRAME_PAD_LENGTH;
-        } else {
-            *buffer = NULL;
-        }
-    } else {
-        *buffer = pvPortMalloc(buffer_size);
-    }
-#else
     *buffer = pvPortMalloc(buffer_size);
-#endif
 
     if (buffer != NULL) {
         return SL_STATUS_OK;
@@ -420,20 +404,21 @@ sl_status_t sl_wfx_host_allocate_buffer(void **buffer,
     }
 }
 
+__attribute__((weak))
 sl_status_t sl_wfx_host_free_buffer(void *buffer, sl_wfx_buffer_type_t type)
 {
-//    if (ipconfigZERO_COPY_RX_DRIVER == 0 || type != SL_WFX_RX_FRAME_BUFFER) {
-        vPortFree(buffer);
-//    }
+    vPortFree(buffer);
 
     return SL_STATUS_OK;
 }
 
+__attribute__((weak))
 sl_status_t sl_wfx_host_transmit_frame(void *frame, uint32_t frame_len)
 {
     return sl_wfx_data_write(frame, frame_len);
 }
 
+__attribute__((weak))
 sl_status_t sl_wfx_host_lock(void)
 {
     sl_status_t status;
@@ -448,6 +433,7 @@ sl_status_t sl_wfx_host_lock(void)
     return status;
 }
 
+__attribute__((weak))
 sl_status_t sl_wfx_host_unlock(void)
 {
 	if (xSemaphoreGetMutexHolder(s_xDriverSemaphore) == xTaskGetCurrentTaskHandle()) {
@@ -458,6 +444,7 @@ sl_status_t sl_wfx_host_unlock(void)
 }
 
 #if SL_WFX_DEBUG_MASK
+__attribute__((weak))
 void sl_wfx_host_log(const char *string, ...)
 {
     va_list ap;

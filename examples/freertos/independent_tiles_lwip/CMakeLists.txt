@@ -6,7 +6,7 @@ if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
 endif()
 
 ## Specify configuration
-# set(USE_WIFI_MANAGER TRUE)
+set(USE_WIFI_MANAGER TRUE)
 # set(USE_DHCPD TRUE)
 set(USE_FATFS TRUE)
 set(USE_LWIP TRUE)
@@ -46,6 +46,7 @@ set(APP_SOURCES
     "src/rpc_test/rpc_test.c"
     "src/gpio_test/gpio_test.c"
     "src/swmem_test/swmem_test.c"
+    "src/wifi_test/wifi_test.c"
 )
 
 set(APP_INCLUDES

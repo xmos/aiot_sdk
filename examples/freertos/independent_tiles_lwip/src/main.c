@@ -253,8 +253,7 @@ void vApplicationDaemonTaskStartup(void *arg)
     {
         rtos_fatfs_init(qspi_flash_ctx);
 
-              lwip_init();
-        // wifi_test_start(wifi_device_ctx, gpio_ctx);
+        wifi_test_start(wifi_device_ctx, gpio_ctx);
     }
     #endif
 

@@ -18,6 +18,8 @@
 #if USE_DHCPD
 #include "dhcpd.h"
 #endif
+#include "lwip/tcpip.h"
+
 
 #define HWADDR_FMT "%02x:%02x:%02x:%02x:%02x:%02x"
 #define HWADDR_ARG(hwaddr) (hwaddr)[0], (hwaddr)[1], (hwaddr)[2], (hwaddr)[3], (hwaddr)[4], (hwaddr)[5]
@@ -479,6 +481,10 @@ static inline int event_callback(int state, char *ssid_out, char *ssid_in, char 
     return mode;
 }
 
+static void lwip_tcpip_init_done(void *arg) {
+    *(int*)arg = 1;
+}
+
 static void wifi_conn_mgr(void *arg)
 {
     scan_list_t scan_list;
@@ -496,6 +502,12 @@ static void wifi_conn_mgr(void *arg)
 #else
     (void) arg;
 #endif
+
+    int done = 0;
+    tcpip_init(lwip_tcpip_init_done, (void*)&done);
+    while( !done ) {
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
 
     while (WIFI_On() != eWiFiSuccess) {
         vTaskDelay(pdMS_TO_TICKS(100));
@@ -701,7 +713,7 @@ void wifi_conn_mgr_start(unsigned manager_priority, unsigned dhcpd_priority)
     xTaskCreate(
             (TaskFunction_t) wifi_conn_mgr,
             "wifi_conn_mgr",
-            portTASK_STACK_DEPTH(wifi_conn_mgr),
+            2000,//portTASK_STACK_DEPTH(wifi_conn_mgr),
             (void *) dhcpd_priority,
             manager_priority,
             &wifi_conn_mgr_task_handle);

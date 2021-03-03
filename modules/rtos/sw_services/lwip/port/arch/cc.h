@@ -54,6 +54,8 @@
 #define PACK_STRUCT_BEGIN
 #define PACK_STRUCT_END
 
+#define LWIP_DECLARE_MEMORY_ALIGNED(variable_name, size) __attribute__((aligned(4))) u8_t variable_name[size]
+
 /*
  * 1. load byte by byte, construct 16 bits word and add: not efficient for most platforms
  * 2. load first byte if odd address, loop processing 16 bits words, add last byte.
@@ -61,10 +63,13 @@
  */
 #define LWIP_CHKSUM_ALGORITHM 3
 
-#define LWIP_PLATFORM_DIAG(x)           do {rtos_printf(x);} while(0)
-#define LWIP_PLATFORM_ASSERT(message)   do {rtos_printf("LWIP Assertion at %d:%d:\n%s\n",__FILE__, __LINE__, message); xassert(0);} while(0)
+#define LWIP_PLATFORM_DIAG(x)           do {rtos_printf x;} while(0)
+#define LWIP_PLATFORM_ASSERT(message)   do {rtos_printf("LWIP Assertion at %s:%d:\n%s\n",__FILE__, __LINE__, message); xassert(0);} while(0)
 
 #define LWIP_PROVIDE_ERRNO
+
+#define LWIP_FREERTOS_CHECK_CORE_LOCKING 1
+#define LWIP_TCPIP_CORE_LOCKING     1
 
 #define LWIP_RAND()  (0)
 #warning NEED TO DEFINE RAND
